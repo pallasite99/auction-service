@@ -14,6 +14,9 @@ cd YOUR_PROJECT_NAME
 npm install
 ```
 
+## Node version
+v15.5.0 (higher versions throw an error for some reason)
+
 ## Sample CreateAuction using AWSLambda
 
 ```
