@@ -15,7 +15,7 @@ async function createAuction(event, context) {
   };
 
   await dynamoDB.put({
-    TableName: 'AuctionsTable',
+    TableName: process.env.AUCTIONS_TABLE_NAME,
     Item: auction,
   }).promise();
   // this is the structure of response expected by AWS Lambda
