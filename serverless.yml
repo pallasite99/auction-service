@@ -10,28 +10,16 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   iamRoleStatements:
-    - Effect: Allow
-      Action: 
-       - "dynamodb:PutItem"
-      Resource: 
-      # service_name:region:acc_id:table/<table_name>
-      # this makes use of serverless-pseudo-params plugin
-       - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/AuctionsTable
+    # ignore error for VSCode, it is stupid
+    # and does not understand that we're trying to import another file here
+    - ${file(iam/auctionsTableIAM.yml):auctionsTableIAM}
 
 # IaaC for DynamoDB table(s)
 resources:
   Resources:
-    AuctionsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: AuctionsTable
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+    # ignore error for VSCode, it is stupid
+    # and does not understand that we're trying to import another file here
+    AuctionsTable: ${file(resources/auctionsTable.yml):AuctionsTable}
 
 functions:
   createAuction:

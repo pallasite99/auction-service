@@ -1,0 +1,8 @@
+auctionsTableIAM:
+    Effect: Allow
+    Action: 
+      - "dynamodb:PutItem"
+    Resource: 
+    # service_name:region:acc_id:table/<table_name>
+    # this makes use of serverless-pseudo-params plugin
+      - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/AuctionsTable
