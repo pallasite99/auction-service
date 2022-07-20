@@ -4,6 +4,7 @@ auctionsTableIAM:
       - "dynamodb:PutItem"
       - "dynamodb:Scan"
       - "dynamodb:GetItem"
+      - "dynamodb:UpdateItem"
     Resource: 
     # service_name:region:acc_id:table/<table_name>
     # this makes use of serverless-pseudo-params plugin
