@@ -1,10 +1,17 @@
 import { v4 as uuid } from 'uuid';
 import AWS from 'aws-sdk';
+// middleware
+import middy from '@middy/core';
+import httpJsonBodyParser from '@middy/http-json-body-parser';
+import httpEventNormalizer from '@middy/http-event-normalizer';
+import httpErrorHandler from '@middy/http-error-handler';
+import createError from 'http-errors';
 // global scope as static
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 async function createAuction(event, context) {
-  const { title } = JSON.parse(event.body);
+  // JSON parsing handled by middy
+  const { title } = event.body;
   // returns current time in YYYY-MM-DDTHH:mm:ss.sssZ format
   const now = new Date();
   const auction = {
@@ -14,10 +21,15 @@ async function createAuction(event, context) {
     createdAt: now.toISOString()
   };
 
-  await dynamoDB.put({
-    TableName: process.env.AUCTIONS_TABLE_NAME,
-    Item: auction,
-  }).promise();
+  try{
+    await dynamoDB.put({
+      TableName: process.env.AUCTIONS_TABLE_NAME,
+      Item: auction,
+    }).promise();
+  } catch (error){
+    console.log(error);
+    throw new createError.InternalServerError(error);
+  }
   // this is the structure of response expected by AWS Lambda
   return {
     // 201--resource created
@@ -27,4 +39,4 @@ async function createAuction(event, context) {
   };
 }
 
-export const handler = createAuction;
+export const handler = middy(createAuction).use(httpJsonBodyParser()).use(httpEventNormalizer()).use(httpErrorHandler());
