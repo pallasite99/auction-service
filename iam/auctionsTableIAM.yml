@@ -2,6 +2,8 @@ auctionsTableIAM:
     Effect: Allow
     Action: 
       - "dynamodb:PutItem"
+      - "dynamodb:Scan"
+      - "dynamodb:GetItem"
     Resource: 
     # service_name:region:acc_id:table/<table_name>
     # this makes use of serverless-pseudo-params plugin
