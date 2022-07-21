@@ -7,12 +7,23 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 async function getAuctions(event, context) {
   let auctions;
+  const { status } = event.queryStringParameters;
 
-  // dynamoDB scan
+  const params = {
+    TableName: process.env.AUCTIONS_TABLE_NAME,
+    IndexName: 'statusAndEndDate',
+    KeyConditionExpression: '#status = :status',
+    ExpressionAttributeValues: {
+      ':status': status,
+    },
+    ExpressionAttributeNames: {
+      '#status': 'status',
+    }
+  };
+
+  // dynamoDB query
   try{
-    const result = await dynamoDB.scan({
-        TableName: process.env.AUCTIONS_TABLE_NAME
-    }).promise();
+    const result = await dynamoDB.query(params).promise();
 
     auctions = result.Items;
   } catch(error){
