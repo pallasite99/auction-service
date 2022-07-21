@@ -5,7 +5,10 @@ auctionsTableIAM:
       - "dynamodb:Scan"
       - "dynamodb:GetItem"
       - "dynamodb:UpdateItem"
+      - "dynamodb:Query"
     Resource: 
     # service_name:region:acc_id:table/<table_name>
     # this makes use of serverless-pseudo-params plugin
       - ${self:custom.AuctionsTable.arn}
+      # ${self:custom.AuctionsTable.arn}/index/statusAndEndDate done using intrinsic functions
+      - !Join ['/', ['${self:custom.AuctionsTable.arn}', 'index', 'statusAndEndDate']]
