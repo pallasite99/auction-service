@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 // middleware
 import commonMiddleware from '../lib/commonMiddleware';
+// import validator from '@middy/validator';
+// import placeBidSchema from '../lib/schemas/placeBidSchema';
 import createError from 'http-errors';
 import { getAuctionById } from './getAuction';
 // global scope as static
@@ -50,3 +52,7 @@ async function placeBid(event, context) {
   }
 
   export const handler = commonMiddleware(placeBid);
+    // does not work!
+    // .use(validator({
+    //   inputSchema: placeBidSchema
+    // }));

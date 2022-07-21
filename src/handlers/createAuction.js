@@ -47,7 +47,7 @@ async function createAuction(event, context) {
   };
 }
 
-export const handler = commonMiddleware(createAuction)
+export const handler = commonMiddleware(createAuction);
   // not working (:/)
   // .use(validator({
   //   inputSchema: createAuctionSchema,
