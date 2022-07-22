@@ -12,6 +12,7 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 async function createAuction(event, context) {
   // JSON parsing handled by middy
   const { title } = event.body;
+  const { email } = event.requestContext.authorizer;
   // returns current time in YYYY-MM-DDTHH:mm:ss.sssZ format
   const now = new Date();
   const end = new Date();
@@ -26,7 +27,8 @@ async function createAuction(event, context) {
     endingAt: end.toISOString(),
     highestBid: {
       amount: 0,
-    }
+    },
+    seller: email,
   };
 
   try{

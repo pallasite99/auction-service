@@ -12,15 +12,28 @@ async function placeBid(event, context) {
     let updatedAuction;
     const { id } = event.pathParameters;
     const { amount } = event.body;
+    const { email } = event.requestContext.authorizer;
 
     const auction = await getAuctionById(id);
 
+    // auction status validation
     if(auction.status !== 'open') {
       throw new createError.Forbidden(`You cannot bid on a closed auction!`);
     }
 
+    // auction bid validation
     if (amount <= auction.highestBid.amount) {
       throw new createError.Forbidden(`Your amount must be higher than ${auction.highestBid.amount}!`);
+    }
+
+    // seller identity validation
+    if (email === auction.seller) {
+      throw new createError.Forbidden(`Sorry, You cannot bid on your own item! Inflation kills`);
+    }
+
+    // seller bid validation
+    if (email === auction.highestBid.bidder) {
+      throw new createError.Forbidden(`You are already the highest bidder with: ${auction.highestBid.amount}!`);
     }
 
     try{
@@ -28,9 +41,10 @@ async function placeBid(event, context) {
       const result = await dynamoDB.update({
         TableName: process.env.AUCTIONS_TABLE_NAME,
         Key: { id },
-        UpdateExpression: 'set highestBid.amount = :amount',
+        UpdateExpression: 'set highestBid.amount = :amount, highestBid.bidder = :bidder',
         ExpressionAttributeValues: {
             ':amount': amount,
+            ':bidder': email,
         },
         ReturnValues: 'ALL_NEW',
       }).promise();
