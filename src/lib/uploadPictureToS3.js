@@ -11,5 +11,6 @@ export async function uploadPictureToS3(key, body) {
         ContentType: 'image/jpeg',
     }).promise();
 
-    return result;
+    // this the where the image gets stored and can be accessed on S3
+    return result.Location;
 }
