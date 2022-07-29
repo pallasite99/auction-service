@@ -11,10 +11,12 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
+    AUCTIONS_BUCKET_NAME: ${self:custom.AuctionsBucket.name}
   iamRoleStatements:
     # ignore error for VSCode, it is stupid
     # and does not understand that we're trying to import another file here
     - ${file(iam/auctionsTableIAM.yml):auctionsTableIAM}
+    - ${file(iam/auctionsBucketIAM.yml):auctionsBucketIAM}
 
 # IaaC for DynamoDB table(s)
 resources:
@@ -22,6 +24,8 @@ resources:
     # ignore error for VSCode, it is stupid
     # and does not understand that we're trying to import another file here
     AuctionsTable: ${file(resources/auctionsTable.yml):AuctionsTable}
+    AuctionsBucket: ${file(resources/AuctionsBucket.yml):AuctionsBucket}
+    AuctionsBucketPolicy: ${file(resources/AuctionsBucket.yml):AuctionsBucketPolicy}
 
 functions:
   createAuction:
@@ -59,12 +63,21 @@ functions:
 
   processAuctions:
     handler: src/handlers/processAuctions.handler
-    # events:
-    #   - schedule: rate(1 minute)
+    events:
+      - schedule: rate(1 minute)
+
+  uploadAuctionPicture:
+    handler: src/handlers/uploadAuctionPicture.handler
+    events: 
+      - http:
+          method: PATCH
+          path: /auction/{id}/uploadpicture
+          authorizer: ${self:custom.authorizer}
 
 custom:
   authorizer: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-auth
-    
   AuctionsTable:
     name: !Ref AuctionsTable
     arn: !GetAtt AuctionsTable.Arn
+  AuctionsBucket:
+    name: auctions-bucket-a5a5a5-${self:provider.stage}
