@@ -1,9 +1,11 @@
 import middy from '@middy/core';
+import validator from '@middy/validator';
 import httpErrorHandler from '@middy/http-error-handler';
 import createHttpError from 'http-errors';
 import { getAuctionById } from './getAuction';
 import { uploadPictureToS3 } from '../lib/uploadPicturetoS3';
 import { setAuctionPicture } from '../lib/setAuctionPicture';
+import uploadAuctionImageSchema from '../lib/schemas/uploadAuctionImageSchema';
 
 export async function uploadAuctionPicture(event) {
     // do not change path to Path here, just don't :)
@@ -38,4 +40,6 @@ export async function uploadAuctionPicture(event) {
 
 export const handler = middy(uploadAuctionPicture)
   .use(httpErrorHandler());
+  // does not work but schema was added!
+  //.use(validator({ inputSchema: uploadAuctionImageSchema }));
 
